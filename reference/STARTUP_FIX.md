@@ -1,14 +1,20 @@
-# Startup Fixes (Template Gaps 1-4)
+# Startup Fix Log
 
-This file documents the changes made to address the previously identified template gaps:
+This is a historical changelog of the startup-template fixes that were applied.
 
-## 1) Missing `/register` Route
+## Summary
 
-Problem:
-- `/login` linked to `/register`, but no register page existed.
+Resolved gaps:
+- Missing register flow
+- Missing dashboard subpages used by sidebar links
+- Redis helper not exercised
+- Middleware-based protected route behavior not implemented
+- Drizzle schema file missing for db scripts
+- Payload Next integration alignment for REST + Admin UI wiring
 
-Fix:
-- Added register page + form + API route.
+## Implemented Fixes
+
+### 1) Added registration flow
 
 Files:
 - `src/app/(auth)/register/page.tsx`
@@ -17,85 +23,54 @@ Files:
 - `src/app/api/auth/register/route.ts`
 
 Behavior:
-- Register form posts to `/api/auth/register`.
-- Server creates a Payload `users` record and then logs in to set the HTTP-only `payload-token` cookie.
-- Redirects to `/dashboard`.
+- Creates Payload user and logs in immediately.
+- Sets `payload-token` cookie.
 
-## 2) Sidebar Links to `/posts`, `/media`, `/categories` 404
-
-Problem:
-- Sidebar linked to `/posts`, `/media`, `/categories` but these routes did not exist.
-
-Fix:
-- Added simple protected dashboard pages that list recent docs via Payload REST API.
+### 2) Added dashboard route pages linked by sidebar
 
 Files:
 - `src/app/(dashboard)/posts/page.tsx`
 - `src/app/(dashboard)/media/page.tsx`
 - `src/app/(dashboard)/categories/page.tsx`
 
-Notes:
-- These pages forward the `payload-token` cookie to the local Payload REST endpoints under `/api/*`.
-- The "Create New Post" / "Upload Media" actions on the dashboard now send users to Payload Admin create/pages instead of non-existent custom routes:
-  - `src/app/(dashboard)/dashboard/page.tsx`
+### 3) Added health endpoint for service verification
 
-## 3) Redis Code Existed But Was Unused
-
-Problem:
-- `src/lib/redis.ts` existed but nothing exercised it, making it hard to confirm Redis wiring.
-
-Fix:
-- Added a simple health endpoint that pings Redis and Postgres.
-
-Files:
+File:
 - `src/app/api/health/route.ts`
 
-Test:
-- Visit `GET /api/health` (expects `redis.ok=true` and `postgres.ok=true` when configured correctly).
+Checks:
+- Redis ping
+- Postgres `select 1`
 
-## 4) Docs Mentioned Middleware Auth, But None Existed
+### 4) Added route protection middleware
 
-Problem:
-- The docs referenced middleware-style auth, but there was no `middleware.ts`.
-
-Fix:
-- Added `src/middleware.ts` that protects:
-  - `/dashboard/*`
-  - `/posts/*`
-  - `/media/*`
-  - `/categories/*`
-
-Files:
+File:
 - `src/middleware.ts`
 
-Behavior:
-- If `payload-token` cookie is missing, redirects to `/login?next=<path>`.
+Protects:
+- `/dashboard/*`
+- `/posts/*`
+- `/media/*`
+- `/categories/*`
 
-## Drizzle Script Gap (Make `pnpm db:*` Usable)
+### 5) Unblocked Drizzle scripts
 
-Problem:
-- `drizzle.config.ts` referenced `src/lib/db/schema.ts`, but it did not exist.
-
-Fix:
-- Added `src/lib/db/schema.ts` with a minimal `app_settings` table so Drizzle migrations can run.
-
-Files:
+File:
 - `src/lib/db/schema.ts`
 
-## Running Locally
+Purpose:
+- Provide minimal schema so `pnpm db:*` commands are operational.
 
-1. Ensure `.env` is set (`DATABASE_URL`, `REDIS_URL`, `PAYLOAD_SECRET`, `NEXT_PUBLIC_SERVER_URL`).
-2. Start:
-   - `pnpm dev`
+### 6) Updated Payload Next integration points
 
-If `pnpm dev` fails with a permissions error binding port 3000:
-- Run with a different port:
-  - `PORT=3001 pnpm dev`
-- Update these in `.env` to match:
-  - `NEXT_PUBLIC_SERVER_URL`
-  - `PAYLOAD_PUBLIC_SERVER_URL`
+Files:
+- `src/app/api/[...slug]/route.ts`
+- `src/app/admin/[[...segments]]/layout.tsx`
+- `src/app/admin/[[...segments]]/page.tsx`
 
-## Note: Offline Builds
+Purpose:
+- Align REST and Admin rendering with current Payload Next API usage in this repo.
 
-This template no longer uses `next/font/google` in `src/app/layout.tsx`, so `pnpm build` does not need to fetch Google Fonts.
+## Current Status
 
+All startup fixes above are in place and present in `main`.

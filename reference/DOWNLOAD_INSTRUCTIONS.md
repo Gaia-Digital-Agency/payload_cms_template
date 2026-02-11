@@ -1,43 +1,51 @@
-# Download / Getting Started
+# Download Instructions
 
-This folder is the project. Once you have it on disk (zip download or git clone), follow the setup instructions.
+If you have this repository on disk (zip or git clone), use this quick bootstrap path.
 
-## What You Should See
-
-Important top-level files:
-- `.env.example` (copy to `.env`)
-- `package.json` (scripts and dependencies)
-- `next.config.js`
-- `tailwind.config.ts`
-- `drizzle.config.ts`
-- `src/middleware.ts` (auth protection for dashboard routes)
-
-Documentation:
-- `reference/SETUP.md` (short setup)
-- `reference/BUILD_GUIDE.md` (full, end-to-end walkthrough)
-- `reference/ARCHITECTURE.md`
-- `reference/DEPLOYMENT.md`
-- `reference/FIX_REQUIRED.md`
-- `reference/STARTUP_FIX.md` (repo-specific change log)
-
-Key app entrypoints:
-- `src/app/page.tsx` (home)
-- `src/app/admin/[[...segments]]/*` (Payload admin UI)
-- `src/app/api/[...slug]/route.ts` (Payload REST handler mounted at `/api/*`)
-- `src/payload/payload.config.ts` (Payload config and collections)
-
-## Quick Start
+## 1. Install
 
 ```bash
 pnpm install
+```
+
+## 2. Configure env
+
+```bash
 cp .env.example .env
+```
+
+Set required values in `.env`:
+- `DATABASE_URL`
+- `POSTGRES_URL`
+- `REDIS_URL`
+- `PAYLOAD_SECRET`
+- `PAYLOAD_PUBLIC_SERVER_URL`
+- `NEXT_PUBLIC_SERVER_URL`
+
+## 3. Run
+
+```bash
 pnpm dev
 ```
 
-Then open:
-- http://localhost:3000/admin (create first user)
-- http://localhost:3000/login (site login)
-- http://localhost:3000/dashboard (protected dashboard)
+## 4. First-run URLs
 
-Optional service check:
-- http://localhost:3000/api/health
+- Home: `http://localhost:3000/`
+- Admin: `http://localhost:3000/admin`
+- Login: `http://localhost:3000/login`
+- Register: `http://localhost:3000/register`
+- Health: `http://localhost:3000/api/health`
+
+## 5. Create first user
+
+Open `/admin` and complete the first-user flow.
+
+## Documentation Index
+
+- `README.md`
+- `reference/SETUP.md`
+- `reference/ARCHITECTURE.md`
+- `reference/BUILD_GUIDE.md`
+- `reference/DEPLOYMENT.md`
+- `reference/STARTUP_FIX.md`
+- `reference/FIX_REQUIRED.md`

@@ -1,36 +1,22 @@
-# Fix Required (Template Gaps)
+# Fix Required Tracker
 
-This file tracks the original starter-template gaps that needed addressing.
+Historical tracker for the initial starter-template gaps.
 
-Status: **Resolved** (see `reference/STARTUP_FIX.md` and `reference/BUILD_GUIDE.md`).
+Status: `Resolved`
 
-## 1) Links to routes that didn’t exist yet (404s)
+For implemented details, see:
+- `reference/STARTUP_FIX.md`
+- `reference/BUILD_GUIDE.md`
 
-- [x] `/login` linked to `/register`, but no register route existed.
-  - Fixed by adding:
-    - `src/app/(auth)/register/page.tsx`
-    - `src/components/auth/RegisterForm.tsx`
-    - `src/app/api/auth/register/route.ts`
-- [x] Sidebar linked to `/posts`, `/media`, `/categories`, but pages didn’t exist.
-  - Fixed by adding:
-    - `src/app/(dashboard)/posts/page.tsx`
-    - `src/app/(dashboard)/media/page.tsx`
-    - `src/app/(dashboard)/categories/page.tsx`
+## Closed Items
 
-## 2) Drizzle migrations not wired up
+- [x] Register route and API were missing.
+- [x] Sidebar-linked dashboard pages were missing.
+- [x] Drizzle schema file for migration scripts was missing.
+- [x] Redis wiring had no verification endpoint.
+- [x] Middleware auth behavior referenced in docs was missing.
+- [x] Payload REST/Admin Next integration needed alignment.
 
-- [x] `drizzle.config.ts` referenced `src/lib/db/schema.ts`, but it was missing.
-  - Fixed by adding `src/lib/db/schema.ts` (minimal schema to keep Drizzle runnable).
-  - Also updated `drizzle.config.ts` to load `.env` without requiring the `dotenv` package.
+## Notes
 
-## 3) Redis present but unused (hard to validate)
-
-- [x] Redis helper existed, but nothing exercised it.
-  - Fixed by adding `src/app/api/health/route.ts` which pings Redis (and Postgres).
-
-## 4) Docs referenced middleware, but none existed
-
-- [x] Added route-level protection via `middleware.ts`.
-  - Implemented as `src/middleware.ts`.
-  - Protects: `/dashboard/*`, `/posts/*`, `/media/*`, `/categories/*`
-  - Redirects unauthenticated users to `/login?next=...`
+This file remains as a lightweight audit artifact.

@@ -1,256 +1,141 @@
-# Next.js 15 + Payload CMS 3.0 Starter Template
+# Next.js 16 + Payload CMS Starter
 
-A production-ready, full-stack starter template featuring Next.js 15, Payload CMS 3.0, PostgreSQL, Redis, and TypeScript.
+Production-ready starter using Next.js App Router and Payload CMS in one codebase.
 
-## 🚀 Features
+## Current Stack
 
-- **Frontend Stack**
-  - Next.js 15 with App Router
-  - React 19 (Server & Client Components)
-  - TypeScript 5.6
-  - Tailwind CSS + SCSS Modules
-  - Framer Motion animations
+- Next.js `16.1.6` (App Router)
+- React `19`
+- TypeScript `5.6`
+- Payload CMS `3.0.0-beta.117`
+- PostgreSQL (Payload primary DB)
+- Redis (optional cache + health checks)
+- Tailwind CSS + SCSS Modules
 
-- **Backend & CMS**
-  - Payload CMS 3.0 (Headless CMS)
-  - Lexical Rich Text Editor
-  - JWT Authentication
-  - Next.js API Routes
+## What Is Included
 
-- **Database & Cache**
-  - PostgreSQL 15 with Drizzle ORM
-  - Redis 7 for caching
-  - Type-safe database queries
+- Payload admin at `/admin`
+- Payload REST API mounted at `/api/*`
+- Auth endpoints at `/api/auth/*` (login/register/me/logout)
+- Protected dashboard routes:
+  - `/dashboard`
+  - `/posts`
+  - `/media`
+  - `/categories`
+- Route protection via `src/middleware.ts`
+- Dashboard shell with sidebar and list views for posts/media/categories
+- Health endpoint at `/api/health` (Redis + Postgres smoke check)
 
-- **Collections**
-  - Users (with authentication)
-  - Media (image CRUD operations)
-  - Posts (blog posts with rich text)
-  - Categories (taxonomy)
+## Project Layout
 
-## 📋 Prerequisites
-
-- Node.js 18.17 or later
-- PostgreSQL 15+
-- Redis 7+
-- pnpm (recommended) or npm
-
-## 🛠️ Installation
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/yourusername/nextjs-payload-starter.git
-cd nextjs-payload-starter
+```text
+src/
+  app/
+    (auth)/
+      login/page.tsx
+      register/page.tsx
+    (dashboard)/
+      layout.tsx
+      dashboard/page.tsx
+      posts/page.tsx
+      media/page.tsx
+      categories/page.tsx
+    admin/[[...segments]]/
+      layout.tsx
+      page.tsx
+    api/
+      [...slug]/route.ts
+      auth/{login,register,me,logout}/route.ts
+      health/route.ts
+  components/
+    auth/
+    dashboard/
+    animations/
+  lib/
+    payload.ts
+    db.ts
+    redis.ts
+  payload/
+    payload.config.ts
+    collections/
+reference/
 ```
 
-### 2. Install dependencies
+## Environment Variables
 
-```bash
-pnpm install
-# or
-npm install
-```
-
-### 3. Set up environment variables
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` with your credentials:
+Copy `.env.example` to `.env` and set:
 
 ```env
-# Database
 DATABASE_URL=postgresql://user:password@localhost:5432/your_database
 POSTGRES_URL=postgresql://user:password@localhost:5432/your_database
-
-# Redis
 REDIS_URL=redis://localhost:6379
-
-# Payload
-PAYLOAD_SECRET=your-super-secret-key-min-32-chars
+PAYLOAD_SECRET=your-secret-at-least-32-characters
 PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000
-
-# Next.js
 NEXT_PUBLIC_SERVER_URL=http://localhost:3000
 NODE_ENV=development
 ```
 
-### 4. Set up the database
+Notes:
+- `DATABASE_URL` is required for Payload and app DB access.
+- `POSTGRES_URL` is used by Drizzle scripts.
+- `REDIS_URL` is required by `src/lib/redis.ts` and `/api/health`.
+
+## Local Development
 
 ```bash
-# (Optional) If you want to use Drizzle migrations
-pnpm db:generate
-
-# Run migrations
-pnpm db:migrate
-
-# Note: Payload itself uses `DATABASE_URL` for its tables via the Postgres adapter.
-```
-
-### 5. Start the development server
-
-```bash
+pnpm install
+cp .env.example .env
 pnpm dev
 ```
 
-Visit:
-- **Frontend**: http://localhost:3000
-- **Admin Panel**: http://localhost:3000/admin
-- **Login**: http://localhost:3000/login
-- **Register**: http://localhost:3000/register
+Open:
+- App: `http://localhost:3000`
+- Admin: `http://localhost:3000/admin`
+- Login: `http://localhost:3000/login`
+- Register: `http://localhost:3000/register`
+- Health: `http://localhost:3000/api/health`
 
-### 6. Create your first admin user
-
-Navigate to http://localhost:3000/admin and create an admin account.
-
-## 📂 Project Structure
-
-```
-├── src/
-│   ├── app/              # Next.js App Router pages
-│   ├── components/       # React components with SCSS modules
-│   ├── payload/          # Payload CMS configuration
-│   │   ├── collections/  # Data models
-│   │   ├── access/       # Access control
-│   │   └── hooks/        # Lifecycle hooks
-│   ├── lib/              # Utilities and configurations
-│   └── styles/           # Global SCSS variables and mixins
-├── public/               # Static assets
-└── reference/            # Documentation
-```
-
-## 🔧 Available Scripts
+## Scripts
 
 ```bash
-# Development
-pnpm dev                  # Start dev server
-pnpm build                # Build for production
-pnpm start                # Start production server
-
-# Database
-pnpm db:generate          # Generate migrations
-pnpm db:migrate           # Run migrations
-pnpm db:push              # Push schema changes
-pnpm db:studio            # Open Drizzle Studio
-
-# Code Quality
-pnpm lint                 # Run ESLint (first run may prompt to set up ESLint config)
-pnpm format               # Format with Prettier
-pnpm type-check           # TypeScript type checking
+pnpm dev
+pnpm build
+pnpm start
+pnpm lint
+pnpm type-check
+pnpm format
+pnpm db:generate
+pnpm db:migrate
+pnpm db:push
+pnpm db:studio
 ```
 
-## 🎯 Key Features
+## Auth and Access Model
 
-### Authentication
-- JWT-based authentication via Payload
-- Protected routes and API endpoints
-- Role-based access control (Admin, User)
-- Route-level protection via `src/middleware.ts` for `/dashboard/*`, `/posts/*`, `/media/*`, `/categories/*`
+- Users authenticate against Payload `users` collection.
+- Login and register set an HTTP-only cookie: `payload-token`.
+- `src/middleware.ts` redirects unauthenticated users from protected routes to `/login?next=...`.
+- `src/app/(dashboard)/layout.tsx` performs server-side user verification via `/api/auth/me`.
+- Collection-level access is defined in:
+  - `src/payload/collections/Users.ts`
+  - `src/payload/collections/Posts.ts`
+  - `src/payload/collections/Categories.ts`
+  - `src/payload/collections/Media.ts`
 
-### Media Management
-- Upload images with drag & drop
-- Automatic image optimization
-- Cloud storage ready (S3 compatible)
+## Build and Runtime Notes
 
-### Content Management
-- Rich text editing with Lexical
-- Draft/Publish workflow
-- Automatic slug generation
-- SEO-friendly metadata
+- `pnpm lint` and `pnpm type-check` should pass in a standard local environment.
+- Build can run with Turbopack (default in Next 16) or Webpack.
+- In restricted/sandboxed environments, build may fail due to blocked local process/network operations.
+- Current Next warnings you may see:
+  - `images.domains` is deprecated in favor of `images.remotePatterns`.
+  - `middleware` convention is deprecated in favor of `proxy`.
 
-### Performance
-- Redis client and helpers included (use as needed)
-- Static page generation where possible
-- Optimized images with Next.js Image
-- Code splitting and lazy loading
+## Documentation Map
 
-## 🎨 Styling
-
-This template uses a hybrid approach:
-- **Tailwind CSS**: Utility-first styling for rapid development
-- **SCSS Modules**: Component-scoped styles for complex components
-- **CSS Variables**: Theme customization in `styles/variables.scss`
-
-## 🔐 Access Control
-
-Default access patterns:
-- **Public**: Can read published posts
-- **Authenticated**: Can manage their own content
-- **Admin**: Full CRUD access to all collections
-
-Customize in `src/payload/access/`
-
-## 📦 Deployment
-
-### Vercel (Recommended)
-
-1. Push to GitHub
-2. Import project in Vercel
-3. Add environment variables
-4. Deploy
-
-### Docker
-
-```bash
-docker-compose up -d
-```
-
-See `reference/DEPLOYMENT.md` for detailed deployment guides.
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────┐
-│           Next.js 15 App Router          │
-│  ┌─────────────┐      ┌──────────────┐  │
-│  │   Frontend  │◄────►│  API Routes  │  │
-│  │  (RSC + CC) │      │              │  │
-│  └─────────────┘      └──────┬───────┘  │
-└────────────────────────────────┼─────────┘
-                                 │
-                    ┌────────────▼──────────┐
-                    │   Payload CMS 3.0     │
-                    │  ┌─────────────────┐  │
-                    │  │  Collections    │  │
-                    │  │  • Users        │  │
-                    │  │  • Media        │  │
-                    │  │  • Posts        │  │
-                    │  │  • Categories   │  │
-                    │  └─────────────────┘  │
-                    └────────┬───────┬──────┘
-                             │       │
-                    ┌────────▼───┐ ┌─▼──────┐
-                    │ PostgreSQL │ │ Redis  │
-                    │ (Drizzle)  │ │ Cache  │
-                    └────────────┘ └────────┘
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
-
-## 📄 License
-
-MIT License - see LICENSE file for details
-
-## 🆘 Support
-
-- Documentation: `/reference`
-- Issues: GitHub Issues
-- Discussions: GitHub Discussions
-
-## 🙏 Acknowledgments
-
-- Next.js Team
-- Payload CMS Team
-- Vercel
-
----
-
-**Built with ❤️ by Roger | net1io.com**
+- Setup: `reference/SETUP.md`
+- Architecture: `reference/ARCHITECTURE.md`
+- Build guide: `reference/BUILD_GUIDE.md`
+- Deployment: `reference/DEPLOYMENT.md`
+- Download instructions: `reference/DOWNLOAD_INSTRUCTIONS.md`
+- Historical fix logs: `reference/FIX_REQUIRED.md`, `reference/STARTUP_FIX.md`
