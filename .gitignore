@@ -6,8 +6,8 @@ yarn-debug.log*
 yarn-error.log*
 vendor
 
-# PYTHIN ENVIRONMENT FILES
-.env
+# PYTHON ENVIRONMENT FILES
+#.env
 .coverage
 .next/
 venv/
@@ -17,8 +17,6 @@ venv/
 __pycache__/
 tmp/
 private/
-*.tsbuildinfo
-.cache/
 
 # MACHINE LEARNING / PYTORCH
 out-*/
@@ -32,7 +30,6 @@ runs/
 
 # GO
 *.exe
-*.exe~
 *.dll
 *.so
 *.dylib
@@ -67,17 +64,17 @@ logs
 /xmlrpc.php
 
 # Config (contains secrets)
-wp-config.php
 # Uploads (too large for git)
-/wp-content/uploads/
+# /wp-content/uploads/
 # Cache and temp
-/wp-content/cache/
-/wp-content/upgrade/
-/wp-content/backup*/
+# /wp-content/cache/
+# /wp-content/upgrade/
+# /wp-content/backup*/
 # Keep themes and plugins
-!/wp-content/
-!/wp-content/themes/
-!/wp-content/plugins/
+wp-config.php
+/wp-content/
+/wp-content/themes/
+/wp-content/plugins/
 
 # DRUPAL
 sites/default/files/
